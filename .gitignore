@@ -26,3 +26,6 @@ server/.env.*
 *.njsproj
 *.sln
 *.sw?
+
+# Firebase deploy cache
+.firebase/

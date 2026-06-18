@@ -232,19 +232,23 @@ export default function AuthModal({ open, initialMode = 'login', onClose }: Auth
           </button>
         </form>
 
-        <p className="mt-5 text-center text-[14px] text-gray-500">
-          {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button
-            type="button"
-            onClick={() => {
-              setMode(isSignup ? 'login' : 'signup');
-              setError(null);
-            }}
-            className="text-sky-600 font-semibold hover:text-sky-700 transition-colors"
-          >
-            {isSignup ? 'Log in' : 'Sign up'}
-          </button>
-        </p>
+        {/* Sign-up toggle hidden for now — only the "back to log in" link shows
+            (signup mode is currently unreachable from the hero, which opens login). */}
+        {isSignup && (
+          <p className="mt-5 text-center text-[14px] text-gray-500">
+            Already have an account?{' '}
+            <button
+              type="button"
+              onClick={() => {
+                setMode('login');
+                setError(null);
+              }}
+              className="text-sky-600 font-semibold hover:text-sky-700 transition-colors"
+            >
+              Log in
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
