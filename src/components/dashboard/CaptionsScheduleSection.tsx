@@ -55,7 +55,7 @@ function PostedChip({ value }: { value: string | number | null }) {
   const str = String(value ?? 'no').toLowerCase();
   const cls = POSTED_STYLES[str] ?? 'bg-amber-50 text-amber-600';
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${cls}`}>
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold capitalize ${cls}`}>
       {str}
     </span>
   );
@@ -226,13 +226,13 @@ export default function CaptionsScheduleSection(_props: Props) {
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-gray-100">
-            <table className="w-full text-left text-[13px]">
+            <table className="w-full text-left text-[11px] sm:text-[13px]">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
                   {SCHEDULED_DISPLAY_COLUMNS.map((col) => (
                     <th
                       key={col}
-                      className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-gray-400 whitespace-nowrap"
+                      className="px-2.5 py-2.5 sm:px-4 sm:py-3 text-[9px] sm:text-[11px] font-semibold uppercase tracking-wide text-gray-400 whitespace-nowrap"
                     >
                       {SCHEDULED_LABELS[col]}
                     </th>
@@ -243,9 +243,11 @@ export default function CaptionsScheduleSection(_props: Props) {
                 {scheduledRows.map((row, i) => (
                   <tr key={i} className="hover:bg-gray-50/60 transition-colors">
                     {SCHEDULED_DISPLAY_COLUMNS.map((col) => (
-                      <td key={col} className="px-4 py-3 align-top whitespace-nowrap">
+                      <td key={col} className="px-2.5 py-2.5 sm:px-4 sm:py-3 align-top whitespace-nowrap">
                         {col === 'scriptname' ? (
-                          <span className="text-gray-800 font-medium">{row[col] || '—'}</span>
+                          <span className="block max-w-[120px] sm:max-w-none truncate text-gray-800 font-medium" title={String(row[col] ?? '')}>
+                            {row[col] || '—'}
+                          </span>
                         ) : col === 'video' ? (
                           <VideoLink value={row[col]} />
                         ) : col === 'scheduled date' ? (
@@ -282,13 +284,13 @@ export default function CaptionsScheduleSection(_props: Props) {
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-gray-100">
-          <table className="w-full text-left text-[13px]">
+          <table className="w-full text-left text-[11px] sm:text-[13px]">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
                 {CAPTION_COLUMNS.map((col) => (
                   <th
                     key={col}
-                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-gray-400 whitespace-nowrap"
+                    className="px-2.5 py-2.5 sm:px-4 sm:py-3 text-[9px] sm:text-[11px] font-semibold uppercase tracking-wide text-gray-400 whitespace-nowrap"
                   >
                     {COLUMN_LABELS[col]}
                   </th>
@@ -306,9 +308,11 @@ export default function CaptionsScheduleSection(_props: Props) {
                 rows.map((row, i) => (
                   <tr key={i} className="hover:bg-gray-50/60 transition-colors">
                     {CAPTION_COLUMNS.map((col) => (
-                      <td key={col} className="px-4 py-3 align-top">
+                      <td key={col} className="px-2.5 py-2.5 sm:px-4 sm:py-3 align-top">
                         {col === 'script name' ? (
-                          <span className="text-gray-800 font-medium whitespace-nowrap">{row[col] || '—'}</span>
+                          <span className="block max-w-[120px] sm:max-w-none truncate text-gray-800 font-medium" title={String(row[col] ?? '')}>
+                            {row[col] || '—'}
+                          </span>
                         ) : col === 'edited video' ? (
                           <VideoLink value={row[col]} />
                         ) : col === 'posted' ? (

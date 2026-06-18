@@ -283,11 +283,11 @@ export default function LibrarySection({ videos, onVideoUpdated }: Props) {
         ) : videosTableData ? (
           <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px] text-left text-[15px]">
-                <thead className="bg-gray-50 text-[13px] uppercase tracking-wide text-gray-500">
+              <table className="w-full sm:min-w-[800px] text-left text-[12px] sm:text-[15px]">
+                <thead className="bg-gray-50 text-[10px] sm:text-[13px] uppercase tracking-wide text-gray-500">
                   <tr>
                     {videosTableData.columns.filter((c) => c !== 's no.').map((col) => (
-                      <th key={col} className="px-5 py-4 font-semibold">{col}</th>
+                      <th key={col} className="px-2.5 py-2.5 sm:px-5 sm:py-4 font-semibold">{col}</th>
                     ))}
                   </tr>
                 </thead>
@@ -296,7 +296,7 @@ export default function LibrarySection({ videos, onVideoUpdated }: Props) {
                     videosTableData.rows.map((row, idx) => (
                       <tr key={idx} className="border-t border-gray-100">
                         {videosTableData.columns.filter((c) => c !== 's no.').map((col) => (
-                          <td key={col} className="px-5 py-5 text-gray-700">
+                          <td key={col} className="px-2 py-3 sm:px-5 sm:py-5 text-gray-700 whitespace-nowrap">
                             {col === 'view video' ? (
                               row[col] ? (
                                 <a
@@ -324,13 +324,17 @@ export default function LibrarySection({ videos, onVideoUpdated }: Props) {
                                   </a>
                                 ) : '-'
                             ) : col === 'current status' ? (
-                              <span className={`inline-flex rounded-full border px-4 py-1.5 text-[13px] font-semibold ${
+                              <span className={`inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 sm:px-4 sm:py-1.5 text-[10px] sm:text-[13px] font-semibold ${
                                 formatVideoStatus(row[col]).style
                               }`}>
                                 {formatVideoStatus(row[col]).label}
                               </span>
                             ) : col === 'date and time of upload' ? (
                               formatVideoDate(row[col])
+                            ) : col === 'script name' ? (
+                              <span className="block max-w-[130px] sm:max-w-none truncate" title={String(row[col] ?? '')}>
+                                {row[col] ?? '-'}
+                              </span>
                             ) : (
                               row[col] ?? '-'
                             )}

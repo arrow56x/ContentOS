@@ -28,7 +28,7 @@ function statusChip(value: string | number | null) {
   const str = String(value ?? 'pending').toLowerCase();
   const cls = STATUS_STYLES[str] ?? 'bg-amber-50 text-amber-600';
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${cls}`}>
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold capitalize ${cls}`}>
       {str}
     </span>
   );
@@ -101,13 +101,13 @@ export default function ProgressSection({ username }: Props) {
       )}
 
       <div className="overflow-x-auto rounded-xl border border-gray-100">
-        <table className="w-full text-left text-[13px]">
+        <table className="w-full text-left text-[11px] sm:text-[13px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               {COLUMNS.map((col) => (
                 <th
                   key={col}
-                  className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-gray-400 whitespace-nowrap"
+                  className="px-2.5 py-2.5 sm:px-4 sm:py-3 text-[9px] sm:text-[11px] font-semibold uppercase tracking-wide text-gray-400 whitespace-nowrap"
                 >
                   {col}
                 </th>
@@ -131,9 +131,11 @@ export default function ProgressSection({ username }: Props) {
               rows.map((row, i) => (
                 <tr key={i} className="hover:bg-gray-50/60 transition-colors">
                   {COLUMNS.map((col) => (
-                    <td key={col} className="px-4 py-3 whitespace-nowrap">
+                    <td key={col} className="px-2.5 py-2.5 sm:px-4 sm:py-3 whitespace-nowrap">
                       {col === 'script name' ? (
-                        <span className="text-gray-800 font-medium">{row[col] ?? '—'}</span>
+                        <span className="block max-w-[120px] sm:max-w-none truncate text-gray-800 font-medium" title={String(row[col] ?? '')}>
+                          {row[col] ?? '—'}
+                        </span>
                       ) : (
                         statusChip(row[col])
                       )}

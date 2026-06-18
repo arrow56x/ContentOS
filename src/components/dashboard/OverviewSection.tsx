@@ -25,7 +25,7 @@ function StatusChip({ value }: { value: string | number | null }) {
   const str = String(value ?? 'pending').toLowerCase();
   const cls = STATUS_STYLES[str] ?? 'bg-amber-50 text-amber-600';
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${cls}`}>
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold capitalize ${cls}`}>
       {str}
     </span>
   );
@@ -83,6 +83,14 @@ export default function OverviewSection({ plan }: Props) {
   const inProgress = progressRows.length - completed;
   const remaining = Math.max(quota - progressRows.length, 0);
   const pct = quota > 0 ? Math.min(Math.round((completed / quota) * 100), 100) : 0;
+
+  // Show skeletons only on the very first load (before any data has arrived).
+  // The 30s auto-refresh won't re-trigger skeletons once data exists.
+  const initialLoading = progressLoading && !progressLastFetched;
+
+  if (initialLoading) {
+    return <OverviewSkeleton />;
+  }
 
   return (
     <div className="space-y-4">
@@ -162,13 +170,13 @@ export default function OverviewSection({ plan }: Props) {
         </p>
 
         <div className="overflow-x-auto rounded-xl border border-gray-100">
-          <table className="w-full text-left text-[13px]">
+          <table className="w-full text-left text-[11px] sm:text-[13px]">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
                 {PROGRESS_COLS.map((col) => (
                   <th
                     key={col}
-                    className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-gray-400 whitespace-nowrap"
+                    className="px-2.5 py-2.5 sm:px-4 sm:py-3 text-[9px] sm:text-[11px] font-semibold uppercase tracking-wide text-gray-400 whitespace-nowrap"
                   >
                     {col}
                   </th>
@@ -192,9 +200,11 @@ export default function OverviewSection({ plan }: Props) {
                 progressRows.map((row, i) => (
                   <tr key={i} className="hover:bg-gray-50/60 transition-colors">
                     {PROGRESS_COLS.map((col) => (
-                      <td key={col} className="px-4 py-3 whitespace-nowrap">
+                      <td key={col} className="px-2.5 py-2.5 sm:px-4 sm:py-3 whitespace-nowrap">
                         {col === 'script name' ? (
-                          <span className="text-gray-800 font-medium">{row[col] ?? '—'}</span>
+                          <span className="block max-w-[120px] sm:max-w-none truncate text-gray-800 font-medium" title={String(row[col] ?? '')}>
+                            {row[col] ?? '—'}
+                          </span>
                         ) : (
                           <StatusChip value={row[col]} />
                         )}
@@ -227,5 +237,67 @@ function Legend({ color, label }: { color: string; label: string }) {
     <span className="inline-flex items-center gap-1.5">
       <span className={`w-2.5 h-2.5 rounded-full ${color}`} /> {label}
     </span>
+  );
+}
+
+/** Animated placeholder shown while the progress data loads for the first time. */
+function OverviewSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse">
+      {/* Quota tracker skeleton */}
+      <section className="bg-white/80 backdrop-blur-md rounded-2xl border border-white/70 shadow-sm p-5">
+        <div className="flex items-center justify-between mb-5">
+          <div className="h-4 w-40 rounded bg-gray-200" />
+          <div className="h-3 w-32 rounded bg-gray-100" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-6 items-center">
+          {/* Ring placeholder */}
+          <div className="mx-auto h-[140px] w-[140px] rounded-full border-[12px] border-gray-100" />
+          {/* Stat tiles */}
+          <div className="grid grid-cols-3 gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rounded-xl bg-gray-100 p-3">
+                <div className="h-6 w-10 rounded bg-gray-200" />
+                <div className="mt-2 h-3 w-16 rounded bg-gray-200" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bar placeholder */}
+        <div className="mt-5">
+          <div className="h-2.5 w-full rounded-full bg-gray-100" />
+          <div className="mt-2 flex items-center gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-3 w-20 rounded bg-gray-100" />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pipeline board skeleton */}
+      <section className="bg-white/80 backdrop-blur-md rounded-2xl border border-white/70 shadow-sm p-5">
+        <div className="h-4 w-44 rounded bg-gray-200 mb-2" />
+        <div className="h-3 w-72 rounded bg-gray-100 mb-4" />
+
+        <div className="rounded-xl border border-gray-100 overflow-hidden">
+          {/* Header strip */}
+          <div className="grid grid-cols-5 gap-2 bg-gray-50 px-4 py-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-3 w-20 rounded bg-gray-200" />
+            ))}
+          </div>
+          {/* Row strips */}
+          {Array.from({ length: 3 }).map((_, r) => (
+            <div key={r} className="grid grid-cols-5 gap-2 px-4 py-4 border-t border-gray-50">
+              {Array.from({ length: 5 }).map((_, c) => (
+                <div key={c} className="h-4 w-24 rounded bg-gray-100" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }

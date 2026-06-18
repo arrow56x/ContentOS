@@ -450,11 +450,11 @@ function ScriptsTableShell({
     <>
       <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-left text-[15px]">
-            <thead className="bg-gray-50 text-[13px] uppercase tracking-wide text-gray-500">
+          <table className="w-full sm:min-w-[980px] text-left text-[12px] sm:text-[15px]">
+            <thead className="bg-gray-50 text-[10px] sm:text-[13px] uppercase tracking-wide text-gray-500">
               <tr>
                 {columns.filter((c) => c !== 's no.').map((column) => (
-                  <th key={column} className="px-5 py-4 font-semibold">
+                  <th key={column} className="px-2 py-2.5 sm:px-5 sm:py-4 font-semibold whitespace-nowrap">
                     {column}
                   </th>
                 ))}
@@ -465,7 +465,7 @@ function ScriptsTableShell({
                 visibleRows.map((row, rowIndex) => (
                   <tr key={rowIndex} className="border-t border-gray-100">
                     {columns.filter((c) => c !== 's no.').map((column) => (
-                      <td key={column} className="px-5 py-5 text-gray-700">
+                      <td key={column} className="px-2 py-3 sm:px-5 sm:py-5 text-gray-700 whitespace-nowrap">
                         {column === 'script' ? (
                           <ScriptCell value={row[column]} onOpen={setOpenScript} />
                         ) : column === 'progress' ? (
@@ -477,6 +477,10 @@ function ScriptsTableShell({
                             saving={approvingSerial === Number(row['s no.'])}
                             onApprove={approve}
                           />
+                        ) : column === 'title' ? (
+                          <span className="block max-w-[140px] sm:max-w-none truncate" title={String(row[column] ?? '')}>
+                            {formatScriptCell(row[column])}
+                          </span>
                         ) : (
                           formatScriptCell(row[column])
                         )}
@@ -558,7 +562,7 @@ function ScriptApproveCell({
       onClick={() => void onApprove(serial)}
       aria-label={approved ? 'Script approved' : 'Approve script'}
       title={approved ? 'Approved' : 'Approve'}
-      className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition disabled:cursor-default ${
+      className={`inline-flex h-7 w-7 sm:h-10 sm:w-10 items-center justify-center rounded-full border transition disabled:cursor-default ${
         approved
           ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
           : 'border-gray-200 bg-white text-gray-500 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700'
@@ -577,7 +581,7 @@ function ScriptProgressCell({
   const progress = normalizeProgress(value);
 
   return (
-    <span className={`inline-flex rounded-full border px-4 py-1.5 text-[13px] font-semibold ${progressStyle(progress)}`}>
+    <span className={`inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 sm:px-4 sm:py-1.5 text-[10px] sm:text-[13px] font-semibold ${progressStyle(progress)}`}>
       {formatProgress(progress)}
     </span>
   );

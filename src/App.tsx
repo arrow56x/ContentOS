@@ -107,8 +107,15 @@ export default function App() {
   const toggleHeroMute = () => {
     const video = heroVideoRef.current;
     if (!video) return;
-    video.muted = !video.muted;
-    setIsHeroMuted(video.muted);
+    const nextMuted = !video.muted;
+    video.muted = nextMuted;
+    if (!nextMuted) {
+      // Unmuting: ensure full volume and that playback is actually running,
+      // since some browsers pause/zero-volume autoplay-muted videos.
+      video.volume = 1;
+      void video.play();
+    }
+    setIsHeroMuted(nextMuted);
   };
 
   const skipHeroForward = () => {
@@ -161,6 +168,15 @@ export default function App() {
         {/* Navigation (z-20, relative) */}
         <div className="w-full max-w-[1440px] mx-auto p-2 sm:p-3 relative z-20">
           <nav className="bg-white/70 backdrop-blur-md rounded-full px-2 relative flex items-center justify-center h-12 shadow-[0_8px_32px_0_rgba(0,0,0,0.04)] border border-white/50">
+            {/* Mobile brand (top-left) */}
+            <button
+              id="nav-brand-mobile"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="absolute left-4 top-1/2 -translate-y-1/2 md:hidden font-cursive text-sky-600 text-[20px] font-bold leading-none"
+            >
+              ContentOS
+            </button>
+
             {/* Desktop Nav Links (centered) */}
             <div className="hidden md:flex items-center gap-6 lg:gap-10">
               <a
@@ -193,11 +209,24 @@ export default function App() {
               </a>
             </div>
 
-            {/* Mobile menu toggle (pinned right) */}
+            {/* Mobile Log in (top-right, logged-out only) */}
+            {!user && (
+              <button
+                id="btn-mobile-login"
+                onClick={() => openAuth('login')}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 px-4 bg-sky-500 hover:bg-sky-600 text-white rounded-full flex items-center justify-center md:hidden text-[13px] font-semibold transition-transform duration-300 active:scale-95"
+              >
+                Log in
+              </button>
+            )}
+
+            {/* Mobile menu toggle (left of Log in) */}
             <button
               id="btn-mobile-toggle"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-gray-900 text-white rounded-full flex items-center justify-center md:hidden transition-transform duration-300 active:scale-95"
+              className={`absolute top-1/2 -translate-y-1/2 w-9 h-9 bg-gray-900 text-white rounded-full flex items-center justify-center md:hidden transition-transform duration-300 active:scale-95 ${
+                user ? 'right-1.5' : 'right-[88px]'
+              }`}
             >
               {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
             </button>
@@ -309,16 +338,17 @@ export default function App() {
                 </>
               ) : (
                 <>
-                  {/* Log in (white bg, blue text — secondary) */}
+                  {/* Log in (white bg, blue text — secondary).
+                      Hidden on mobile — mobile uses the top-right nav Log in button. */}
                   <button
                     id="btn-hero-login"
                     onClick={() => openAuth('login')}
-                    className="min-w-[150px] bg-white hover:bg-sky-50 border border-sky-500 text-sky-600 font-['Inter'] text-[14px] font-semibold tracking-[-0.01em] rounded-full px-6 py-2.5 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+                    className="hidden sm:flex min-w-[150px] bg-white hover:bg-sky-50 border border-sky-500 text-sky-600 font-['Inter'] text-[14px] font-semibold tracking-[-0.01em] rounded-full px-6 py-2.5 items-center justify-center shadow-sm hover:shadow-md transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
                   >
                     <TextRoll text="Log in" />
                   </button>
 
-                  {/* Sign in (blue bg, white text — primary) → sign up */}
+                  {/* Sign in (sign up) — hidden for now.
                   <button
                     id="btn-hero-signin"
                     onClick={() => openAuth('signup')}
@@ -326,6 +356,7 @@ export default function App() {
                   >
                     <TextRoll text="Sign in" />
                   </button>
+                  */}
                 </>
               )}
             </div>
@@ -348,6 +379,18 @@ export default function App() {
               onPause={() => setIsHeroPlaying(false)}
               className="w-full h-full object-cover"
             />
+
+            {/* Always-visible "tap for sound" badge while muted (desktop + mobile) */}
+            {isHeroMuted && (
+              <button
+                id="hero-unmute-badge"
+                onClick={toggleHeroMute}
+                aria-label="Tap for sound"
+                className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md px-3 py-1.5 text-[12px] font-semibold text-white shadow-md hover:bg-black/75 transition-colors active:scale-95"
+              >
+                <VolumeX size={14} /> Tap for sound
+              </button>
+            )}
 
             {/* Hover controls overlay */}
             <div

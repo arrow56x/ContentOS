@@ -11,6 +11,7 @@ import {
   Loader2,
   Link2,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { auth } from '../firebase';
 import { useAuth } from '../auth/AuthContext';
 import { pipelineApi, type ClientPlan, type Video } from '../lib/api';
@@ -32,13 +33,13 @@ type SectionKey =
   | 'schedule'
   | 'connections';
 
-const SECTIONS: { key: SectionKey; label: string; icon: typeof LayoutDashboard }[] = [
-  { key: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { key: 'scripts', label: 'Scripts', icon: FileText },
-  { key: 'library', label: 'Video Library', icon: Film },
-  { key: 'progress', label: 'Progress', icon: TrendingUp },
-  { key: 'schedule', label: 'Captions & Schedule', icon: CalendarDays },
-  { key: 'connections', label: 'Connections', icon: Link2 },
+const SECTIONS: { key: SectionKey; label: string; shortLabel: string; icon: LucideIcon }[] = [
+  { key: 'overview', label: 'Overview', shortLabel: 'Home', icon: LayoutDashboard },
+  { key: 'scripts', label: 'Scripts', shortLabel: 'Scripts', icon: FileText },
+  { key: 'library', label: 'Video Library', shortLabel: 'Library', icon: Film },
+  { key: 'progress', label: 'Progress', shortLabel: 'Progress', icon: TrendingUp },
+  { key: 'schedule', label: 'Captions & Schedule', shortLabel: 'Schedule', icon: CalendarDays },
+  { key: 'connections', label: 'Connections', shortLabel: 'Connect', icon: Link2 },
 ];
 
 const SECTION_KEYS = new Set<SectionKey>([
@@ -126,11 +127,39 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-sky-50 to-white font-apple text-gray-900 p-3 sm:p-5">
+    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-sky-50 to-white font-apple text-gray-900 p-3 sm:p-5 pb-24 lg:pb-5">
+      {/* Mobile top bar — brand + explore + avatar (hidden on desktop) */}
+      <div className="lg:hidden mb-3 flex items-center justify-between rounded-2xl bg-white/80 backdrop-blur-md border border-white/70 shadow-sm px-4 py-3">
+        <button onClick={() => navigate('/')} className="flex items-center shrink-0" title="Back to site">
+          <span className="font-cursive text-sky-600 text-[22px] font-bold leading-none">ContentOS</span>
+        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => goToSection('explore')}
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+              section === 'explore' ? 'bg-sky-500 text-white shadow-sm' : 'bg-sky-50 text-gray-600'
+            }`}
+            title="Explore"
+            aria-label="Explore"
+          >
+            <Compass size={18} />
+          </button>
+          <button onClick={() => setSettingsOpen(true)} title="Account & settings" aria-label="Account & settings">
+            {photoURL ? (
+              <img src={photoURL} alt={greetingName} className="w-9 h-9 rounded-full object-cover shadow-sm ring-2 ring-white" />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center text-[13px] font-semibold shadow-sm ring-2 ring-white">
+                {initials}
+              </div>
+            )}
+          </button>
+        </div>
+      </div>
+
       {/* Body grid — no top bar; sidebar holds brand, nav, and the profile area */}
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5 items-start">
-        {/* Sidebar — fills the viewport height; profile pinned to the bottom */}
-        <aside className="bg-white/80 backdrop-blur-md rounded-2xl border border-white/70 shadow-sm p-5 lg:sticky lg:top-5 lg:h-[calc(100vh-2.5rem)] flex flex-col gap-4">
+        {/* Sidebar — desktop only; mobile uses the bottom nav bar instead */}
+        <aside className="hidden lg:flex bg-white/80 backdrop-blur-md rounded-2xl border border-white/70 shadow-sm p-5 lg:sticky lg:top-5 lg:h-[calc(100vh-2.5rem)] flex-col gap-4">
           {/* Brand */}
           <div className="flex items-center justify-between gap-3 px-1">
             <button
@@ -157,7 +186,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Nav grows to fill, spreading items evenly down the sidebar */}
-          <nav className="flex lg:flex-col gap-2 lg:gap-1 overflow-x-auto lg:flex-1 lg:justify-evenly">
+          <nav className="flex flex-col gap-1 flex-1 justify-evenly">
             {SECTIONS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
@@ -255,6 +284,29 @@ export default function DashboardPage() {
           )}
         </main>
       </div>
+
+      {/* Mobile bottom navigation — icons only (hidden on desktop) */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-gray-100 bg-white/95 backdrop-blur-md shadow-[0_-2px_12px_rgba(0,0,0,0.05)]">
+        <div className="flex items-stretch justify-around px-1 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
+          {SECTIONS.map(({ key, shortLabel, icon: Icon }) => {
+            const active = section === key;
+            return (
+              <button
+                key={key}
+                onClick={() => goToSection(key)}
+                className={`flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl py-1.5 transition-colors ${
+                  active ? 'text-sky-600' : 'text-gray-400'
+                }`}
+                aria-label={shortLabel}
+                aria-current={active ? 'page' : undefined}
+              >
+                <Icon size={20} className={active ? 'text-sky-600' : 'text-gray-400'} />
+                <span className="text-[10px] font-medium leading-none">{shortLabel}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* Account & settings drawer (opened from the avatar) */}
       <SettingsPanel
