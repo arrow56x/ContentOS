@@ -73,7 +73,7 @@ function rowMatchesFilters(row: ScriptRow, f: ScriptFilters): boolean {
   return true;
 }
 
-export default function ScriptsSection({ videos, username, onReviewed }: Props) {
+export default function ScriptsSection({ videos, username }: Props) {
   const [checkingScripts, setCheckingScripts] = useState(true);
   const [loadingScripts, setLoadingScripts] = useState(false);
   const [scriptsTable, setScriptsTable] = useState<{
